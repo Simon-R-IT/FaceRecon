@@ -104,12 +104,23 @@ unsigned long** int_image(SDL_Surface *img){
   return arr;
 }
 
+unsigned long sumImagePart(unsigned long** integralImage,int x1,int y1,int x2, int y2){
+  int sum = integralImage[x2][y2];
+  if((x1-1>=0) & (y1-1>=0))
+    sum = sum - integralImage[x1-1][y2] - integralImage[x2][y1-1]+ integralImage[x1-1][y1-1];
+  else if((x1-1>=0) & (y1-1<0))
+    sum = sum - integralImage[x1-1][y2];
+  else if((y1-1>=0) & (x1-1<0))
+    sum = sum - integralImage[x2][y1-1];
+  return sum;
+}
+
 int main (int argc, char *argv[]){
   if(argc<2)
     return 1;
   init_sdl();
   SDL_Surface * img=load_image(argv[1]);
-    for(int i=0;i<5;i++){
+    for(int i=0;i<7;i++){
       for(int j=0;j<7;j++){
 	printf("%d |",get_pixel_value(img,j,i));// j,i
       }
@@ -117,16 +128,17 @@ int main (int argc, char *argv[]){
     }
     printf("\n");
     unsigned long** integral= int_image(img);
-  for(int i=0;i<5;i++){
+  for(int i=0;i<7;i++){
     for(int j=0;j<7;j++){
       printf("%ld |",integral[j][i]);//j,i exactly  the same system of coordinates
     }
     printf("\n");
-    }
+  }
+  printf("\n Voici la somme comprise entre (0,0) et (4,4) \%ld",sumImagePart(integral,1,0,3,2));
   free(*integral);
   free(integral);
   return 0;
-
-
 }
+
+
 
