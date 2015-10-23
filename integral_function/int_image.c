@@ -79,12 +79,12 @@ Uint8 get_pixel_value(SDL_Surface *img,int x,int y){
   SDL_GetRGB(getpixel(img,x,y),img->format,&r,&b,&b);
   return r;
 }
-int** int_image(SDL_Surface *img){
-  int newpixel;
-  int* values = calloc(img->h*img->w,sizeof(int));
-  int** arr = malloc(img->h*sizeof(int*));
-  for (int i=0;i<img->h;++i){
-    arr[i]= values + i*img->w;
+unsigned long** int_image(SDL_Surface *img){
+  unsigned long newpixel;
+  unsigned long* values = calloc(img->h*img->w,sizeof(unsigned long));
+  unsigned long** arr = malloc(img->w*sizeof(unsigned long*));
+  for (int i=0;i<img->w;++i){
+    arr[i]= values + i*img->h;
   }
   for(int i=0;i<img->w;i++){
     for(int j=0;j<img->h;j++){
@@ -92,13 +92,13 @@ int** int_image(SDL_Surface *img){
 	if(j-1<0)
 	  newpixel = get_pixel_value(img,i,j);
 	else
-	  newpixel = get_pixel_value(img,i,j)+arr[j-1][i];
+	  newpixel = get_pixel_value(img,i,j)+arr[i][j-1];
       }
       else if(j-1<0)
-	newpixel =get_pixel_value(img,i,j)+arr[j][i-1];
+	newpixel =get_pixel_value(img,i,j)+arr[i-1][j];
       else
-	newpixel =get_pixel_value(img,i,j)+arr[j-1][i]+arr[j][i-1]-arr[j-1][i-1];
-      arr[j][i]=newpixel;
+	newpixel =get_pixel_value(img,i,j)+arr[i][j-1]+arr[i-1][j]-arr[i-1][j-1];
+      arr[i][j]=newpixel;
     }
   }
   return arr;
@@ -116,10 +116,10 @@ int main (int argc, char *argv[]){
       printf("\n");
     }
     printf("\n");
-    int** integral= int_image(img);
+    unsigned long** integral= int_image(img);
   for(int i=0;i<5;i++){
     for(int j=0;j<7;j++){
-      printf("%d |",integral[i][j]);//i,j not the same system of coordinates
+      printf("%ld |",integral[j][i]);//j,i exactly  the same system of coordinates
     }
     printf("\n");
     }
