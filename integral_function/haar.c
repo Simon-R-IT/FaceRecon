@@ -4,7 +4,7 @@
 # include <SDL/SDL_image.h>
 # include <err.h>
 # include <SDL.h>
-# include <integral_fucntion.h>
+# include "integral_function.h"
 
 void set_feature(unsigned long* tab ,int rank,  int f, int i, int j, int w, int h, int rst){
         tab[rank]=f;

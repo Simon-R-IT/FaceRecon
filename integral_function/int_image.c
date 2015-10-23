@@ -4,7 +4,7 @@
 # include <SDL/SDL_image.h>
 # include <err.h>
 # include <SDL.h>
-
+# include "integral_function.h"
 static inline
 Uint8* pixelref(SDL_Surface *surf, unsigned x, unsigned y) {
   int bpp = surf->format->BytesPerPixel;
