@@ -5,6 +5,7 @@
 # include <err.h>
 # include <SDL.h>
 # include "int_image.h"
+
 static inline
 Uint8* pixelref(SDL_Surface *surf, unsigned x, unsigned y) {
   int bpp = surf->format->BytesPerPixel;
@@ -83,153 +84,169 @@ unsigned long** int_image(SDL_Surface *img){
   unsigned long newpixel;
   unsigned long* values = calloc(img->h*img->w,sizeof(unsigned long));
   unsigned long** arr = malloc(img->w*sizeof(unsigned long*));
-  for (int i=0;i<img->w;++i){
+  for (int i=0; i < img->w; ++i){
     arr[i]= values + i*img->h;
   }
-  for(int i=0;i<img->w;i++){
-    for(int j=0;j<img->h;j++){
-      if(i-1<0){
-	if(j-1<0)
+  for(int i=0; i<img->w; i++){
+    for(int j=0; j<img->h; j++){
+      if(i-1 < 0){
+	if(j-1 < 0)
 	  newpixel = get_pixel_value(img,i,j);
 	else
 	  newpixel = get_pixel_value(img,i,j)+arr[i][j-1];
       }
-      else if(j-1<0)
-	newpixel =get_pixel_value(img,i,j)+arr[i-1][j];
+      else if(j-1 < 0)
+	newpixel = get_pixel_value(img,i,j)+arr[i-1][j];
       else
-	newpixel =get_pixel_value(img,i,j)+arr[i][j-1]+arr[i-1][j]-arr[i-1][j-1];
-      arr[i][j]=newpixel;
+	newpixel = get_pixel_value(img,i,j)+arr[i][j-1]+arr[i-1][j]-arr[i-1][j-1];
+      arr[i][j] = newpixel;
     }
   }
   return arr;
 }
 
-unsigned long sumImagePart(unsigned long** integralImage,int x1,int y1,int x2, int y2){
-  int sum = integralImage[x2][y2];
-  if((x1-1>=0) & (y1-1>=0))
+unsigned long sumImagePart(unsigned long** integralImage,unsigned long x1,unsigned long y1,unsigned long x2, unsigned long y2){
+  unsigned long sum = integralImage[x2][y2];
+  if((x1 >= 1) & (y1 >= 1))
     sum = sum - integralImage[x1-1][y2] - integralImage[x2][y1-1]+ integralImage[x1-1][y1-1];
-  else if((x1-1>=0) & (y1-1<0))
+  else if((x1 >= 1) & (y1 < 1))
     sum = sum - integralImage[x1-1][y2];
-  else if((y1-1>=0) & (x1-1<0))
+  else if((y1 >= 1) & (x1 < 1))
     sum = sum - integralImage[x2][y1-1];
   return sum;
 }
-struct feature
-{
-        unsigned long f;
-        unsigned long i;
-        unsigned long j;
-        unsigned long w;
-        unsigned long h;
-        unsigned long rst;
-};
-struct feature  set_feature(unsigned long f, unsigned long i, unsigned long j, unsigned long w, unsigned long h, unsigned long rst){
-       struct feature feat;
-        feat.f=f;
-        feat.i=i;
-        feat.j=j;
-        feat.w=w;
-        feat.h=h;
-        feat.rst=rst;
-        return feat;
 
+
+typedef struct
+{
+  unsigned long f;
+  unsigned long i;
+  unsigned long j;
+  unsigned long w;
+  unsigned long h;
+  long rst;
+} feature;
+
+void set_feature(feature *features, unsigned long index, unsigned long f, unsigned long i, unsigned long j, unsigned long w, unsigned long h,  long rst)
+{
+  features[index].f = f;
+  features[index].i = i;
+  features[index].j = j;
+  features[index].w = w;
+  features[index].h = h;
+  features[index].rst = rst;
 }
 
-struct feature* haar_features(SDL_Surface * img){
-printf("test1");
-  unsigned long** tab=int_image(img);
-printf("test2");
-  struct feature* rst;
-  unsigned long idx = 0;
+feature* haar_features(SDL_Surface * img)
+{
+  printf("test1");
+  unsigned long** tab = int_image(img);
+  printf("test2");
+  feature *features = malloc(200000* sizeof(*features));
+  unsigned long index = 0;
+  unsigned long i = 0;
+  unsigned long j = 0;
   unsigned long w = 1;
-  unsigned long h = 1;
-  unsigned long S1 = 0;
-  unsigned long S2 = 0;
+  unsigned long  h = 1;
+  long S1 = 0;
+  long S2 = 0;
   unsigned long S3 = 0;
   unsigned long S4 = 0;
-  for(unsigned long i = 1; 1 <= i && i <= 24; i++){
-    for(unsigned long j = 1; j <= 24; j++){
-       for(; i+h-1 <= 24; w++){
-         for(; j+2*w-1 ; h++){
-		  printf("1, %lu,%lu, %lu, %lu",i,j,w,h);
-
-           S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
-           S2 = sumImagePart(tab,i,i+h-1,j+w,j+2*w-1);
-	   printf("1, %lu,%lu, %lu, %lu",i,j,w,h);
-           *rst = set_feature(1, i, j, w, h, S1-S2);
-           idx++;
-	   rst++;
+  for(i = 0;  i <= 23; i++)
+  {
+    for(j = 0; j <= 23; j++)
+    {
+       for(h=1; i+h-1 <= 23; h++)
+       {
+         for(w=1; j+2*w-1<24 ; w++)
+	 {
+	   printf("Première itération \n");
+           S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
+           S2 = sumImagePart(tab, i, i+h-1, j+w, j+2*w-1);
+	   printf("Fini\n");
+           set_feature(features, index, 1, i, j, w, h, S1-S2);
+	   printf("Pas de problemes \n");
+           index++;
+	 }
        }
-     }
-   }
- }
-        w=1;
-        h=1;
-        for(unsigned long i = 1; 1 <= i && i <= 24; i++){
-         for(unsigned long j = 1; j <= 24; j++){
-           for(; i+h-1 <= 24; w++){
-            for(; j+3*w-1 ; h++){
-            S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
-            S2 = sumImagePart(tab,i,i+h-1,j+w,j+2*w-1);
-            S3 = sumImagePart(tab,i,i+h-1,j+2*w,j+3*w-1);
-            *rst = set_feature(2, i, j, w, h, S1-S2+S3);
-            idx++;
-	    rst++;
-       }
-     }
-   }
- }
-	w=1;
-        h=1;
-        for(unsigned long i = 1; 1 <= i && i <= 24; i++){
-         for(unsigned long j = 1; j <= 24;j++){
-           for(; i+2*h-1 <= 24; w++){
-            for(; j+w-1 ; h++){
-            S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
-            S2 = sumImagePart(tab,i+h,i+2*h-1,j,j+w-1);
-            *rst = set_feature(3, i, j, w, h, S1-S2);
-            idx++;
-	    rst++;
-
-       }
-     }
-   }
- }
-
-        w=1;
-        h=1;
-         for(unsigned long i = 1; 1 <= i && i <= 24; i++){
-         for(unsigned long j = 1; j <= 24;j++){
-           for(; i+3*h-1 <= 24; w++){
-            for(; j+w-1 ; h++){
-            S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
-            S2 = sumImagePart(tab,i+h,i+2*h-1,j,j+w-1);
-            S3 = sumImagePart(tab,i+2*h,i+3*h-1,j,j+w-1);
-            *rst = set_feature(4, i, j, w, h, S1-S2+S3);
-            idx++;
-	    rst++;
-       }
-     }
-   }
- }
-	w=1;
-        h=1;
-         for(unsigned long i = 1; 1 <= i && i <= 24; i++){
-         for(unsigned long j = 1; j <= 24; j++){
-           for(; i+2*h-1 <= 24; w++){
-            for(; j+2*w-1 ; h++){
-            S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
-            S2 = sumImagePart(tab,i+h,i+2*h-1,j,j+w-1);
-            S3 = sumImagePart(tab,i,i+h-1,j+w,j+2*w-1);
-            S4 = sumImagePart(tab,i+h, i+2*h-1,j+w,j+2*w-1);
-            *rst = set_feature(5, i, j, w, h, S1-S2-S3+S4);
-            idx++;
- 	    rst++;
-       }
-     }
-   }
- }
-	return rst;
+    }
+  }
+  printf("Premier fini ! ");
+  for(i = 0;  i <= 23; i++)
+  {
+    for(j = 0; j <= 23; j++)
+    {
+      for(h=1; i+h-1 <= 23; h++)
+      {
+	for(w=1; j+3*w-1<24 ; w++)
+        {
+	  printf("Deuxième boucle\n");
+	  S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
+          S2 = sumImagePart(tab, i, i+h-1, j+w, j+2*w-1);
+          S3 = sumImagePart(tab, i, i+h-1, j+2*w, j+3*w-1);
+          set_feature(features, index, 2, i, j, w, h, S1-S2+S3);
+          index++;
+	}
+      }
+    }
+  }
+  for(i = 0;   i <= 23; i++)
+  {
+    for(j = 0; j <= 23;j++)
+    {
+      for(h=1; i+2*h-1 <= 23; h++)
+      {
+	for(w=1; j+w-1 <24 ; w++)
+	{
+	  printf("Troisième boucle\n");
+	  S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
+          S2 = sumImagePart(tab, i+h, i+2*h-1, j, j+w-1);
+          set_feature(features, index, 3, i, j, w, h, S1-S2);
+          index++;
+	}
+      }
+    }
+  }
+  for(i = 0;  i <= 23; i++)
+  {
+    for(j = 0; j <=23;j++)
+    {
+      for(h=1; i+3*h-1 <= 23; h++)
+      {
+	for(w=1; j+w-1 <24 ; w++)
+	{
+	  printf("Quatrième boucle\n");
+	  S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
+          S2 = sumImagePart(tab,i+h,i+2*h-1,j,j+w-1);
+          S3 = sumImagePart(tab,i+2*h,i+3*h-1,j,j+w-1);
+          set_feature(features, index, 4, i, j, w, h, S1-S2+S3);
+	  index++;
+	  printf("%lu\n",index);
+	}
+      }
+    }
+  }
+  for(i = 0;  i <= 23; i++)
+  {
+    for(j = 0; j <= 23; j++)
+    {
+      for(h=1; i+2*h-1 <= 23; h++)
+      {
+	for(w=1; j+2*w-1<=23 ; w++)
+	{
+	  printf("Cinquième boucle");
+	  S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
+          S2 = sumImagePart(tab, i+h, i+2*h-1, j, j+w-1);
+          S3 = sumImagePart(tab, i, i+h-1, j+w, j+2*w-1);
+          S4 = sumImagePart(tab, i+h, i+2*h-1, j+w, j+2*w-1);
+          set_feature(features, index, 5, i, j, w, h, S1-S2-S3+S4);
+          index++;
+	}
+      }
+    }
+  }
+  printf("\n%lu\n",index);
+  return features;
 }
 
 
@@ -248,12 +265,13 @@ int main (int argc, char *argv[]){
     unsigned long** integral= int_image(img);
   for(int i=0;i<7;i++){
     for(int j=0;j<7;j++){
-      printf("%ld |",integral[j][i]);//j,i exactly  the same system of coordinates
+      printf("%04ld |",integral[j][i]);//j,i exactly  the same system of coordinates
     }
     printf("\n");
   }
-  printf("\n Voici la somme comprise entre (0,0) et (4,4) \%ld",sumImagePart(integral,1,0,3,2));
-  struct feature* results = haar_features(img);
+  printf("\n Voici la somme comprise entre (1,1) et (2,2) \%ld\n",sumImagePart(integral,0,0,1,1));
+  feature* results = haar_features(img);
+  free(results);
   free(*integral);
   free(integral);
   return 0;
