@@ -150,8 +150,8 @@ feature* haar_features(SDL_Surface * img)
   unsigned long  h = 1;
   long S1 = 0;
   long S2 = 0;
-  unsigned long S3 = 0;
-  unsigned long S4 = 0;
+  long S3 = 0;
+  long S4 = 0;
   for(i = 0;  i <= 23; i++)
   {
     for(j = 0; j <= 23; j++)
@@ -160,18 +160,15 @@ feature* haar_features(SDL_Surface * img)
        {
          for(w=1; j+2*w-1<24 ; w++)
 	 {
-	   printf("Première itération \n");
-           S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
-           S2 = sumImagePart(tab, i, i+h-1, j+w, j+2*w-1);
-	   printf("Fini\n");
+           S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
+           S2 = sumImagePart(tab, i, j+w, i+h-1, j+2*w-1);
+	   printf("S1 %lu S2 %lu\n", S1, S2);
            set_feature(features, index, 1, i, j, w, h, S1-S2);
-	   printf("Pas de problemes \n");
            index++;
 	 }
        }
     }
   }
-  printf("Premier fini ! ");
   for(i = 0;  i <= 23; i++)
   {
     for(j = 0; j <= 23; j++)
@@ -180,10 +177,9 @@ feature* haar_features(SDL_Surface * img)
       {
 	for(w=1; j+3*w-1<24 ; w++)
         {
-	  printf("Deuxième boucle\n");
-	  S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
-          S2 = sumImagePart(tab, i, i+h-1, j+w, j+2*w-1);
-          S3 = sumImagePart(tab, i, i+h-1, j+2*w, j+3*w-1);
+	  S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
+          S2 = sumImagePart(tab, i, j+w, i+h-1, j+2*w-1);
+          S3 = sumImagePart(tab, i, j+2*w, i+h-1, j+3*w-1);
           set_feature(features, index, 2, i, j, w, h, S1-S2+S3);
           index++;
 	}
@@ -198,9 +194,8 @@ feature* haar_features(SDL_Surface * img)
       {
 	for(w=1; j+w-1 <24 ; w++)
 	{
-	  printf("Troisième boucle\n");
-	  S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
-          S2 = sumImagePart(tab, i+h, i+2*h-1, j, j+w-1);
+	  S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
+          S2 = sumImagePart(tab, i+h, j, i+2*h-1, j+w-1);
           set_feature(features, index, 3, i, j, w, h, S1-S2);
           index++;
 	}
@@ -211,17 +206,15 @@ feature* haar_features(SDL_Surface * img)
   {
     for(j = 0; j <=23;j++)
     {
-      for(h=1; i+3*h-1 <= 23; h++)
+      for(h = 1; i+3*h-1 <= 23; h++)
       {
-	for(w=1; j+w-1 <24 ; w++)
+	for(w = 1; j+w-1 <24 ; w++)
 	{
-	  printf("Quatrième boucle\n");
-	  S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
-          S2 = sumImagePart(tab,i+h,i+2*h-1,j,j+w-1);
-          S3 = sumImagePart(tab,i+2*h,i+3*h-1,j,j+w-1);
+	  S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
+          S2 = sumImagePart(tab, i+h, j, i+2*h-1, j+w-1);
+          S3 = sumImagePart(tab, i+2*h, j, i+3*h-1, j+w-1);
           set_feature(features, index, 4, i, j, w, h, S1-S2+S3);
 	  index++;
-	  printf("%lu\n",index);
 	}
       }
     }
@@ -234,11 +227,10 @@ feature* haar_features(SDL_Surface * img)
       {
 	for(w=1; j+2*w-1<=23 ; w++)
 	{
-	  printf("Cinquième boucle");
-	  S1 = sumImagePart(tab, i, i+h-1, j, j+w-1);
-          S2 = sumImagePart(tab, i+h, i+2*h-1, j, j+w-1);
-          S3 = sumImagePart(tab, i, i+h-1, j+w, j+2*w-1);
-          S4 = sumImagePart(tab, i+h, i+2*h-1, j+w, j+2*w-1);
+	  S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
+          S2 = sumImagePart(tab, i+h, j, i+2*h-1, j+w-1);
+          S3 = sumImagePart(tab, i, j+w, i+h-1, j+2*w-1);
+          S4 = sumImagePart(tab, i+h, j+w, i+2*h-1,j+2*w-1);
           set_feature(features, index, 5, i, j, w, h, S1-S2-S3+S4);
           index++;
 	}
@@ -246,6 +238,7 @@ feature* haar_features(SDL_Surface * img)
     }
   }
   printf("\n%lu\n",index);
+  printf("Feature : %lu, %lu, %lu, %lu, %lu, %ld\n", features[1500].f, features[1500].i, features[1500].j, features[1500].w, features[1500].h, features[1500].rst); 
   return features;
 }
 
@@ -276,6 +269,3 @@ int main (int argc, char *argv[]){
   free(integral);
   return 0;
 }
-
-
-
