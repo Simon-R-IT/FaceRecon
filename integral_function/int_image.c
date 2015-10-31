@@ -116,14 +116,14 @@ unsigned long sumImagePart(unsigned long** integralImage,int x1,int y1,int x2, i
 }
 struct feature
 {
-        int f;
-        int i;
-        int j;
-        int w;
-        int h;
-        int rst;
+        unsigned long f;
+        unsigned long i;
+        unsigned long j;
+        unsigned long w;
+        unsigned long h;
+        unsigned long rst;
 };
-struct feature  set_feature(int f, int i, int j, int w, int h, int rst){
+struct feature  set_feature(unsigned long f, unsigned long i, unsigned long j, unsigned long w, unsigned long h, unsigned long rst){
        struct feature feat;
         feat.f=f;
         feat.i=i;
@@ -140,22 +140,22 @@ printf("test1");
   unsigned long** tab=int_image(img);
 printf("test2");
   struct feature* rst;
-  int idx = 0;
-  int w = 1;
-  int h = 1;
-  int S1 = 0;
-  int S2 = 0;
-  int S3 = 0;
-  int S4 = 0;
-  for(int i = 1; 1 <= i && i <= 24; i++){
-    for(int j = 1; j <= 24; j++){
+  unsigned long idx = 0;
+  unsigned long w = 1;
+  unsigned long h = 1;
+  unsigned long S1 = 0;
+  unsigned long S2 = 0;
+  unsigned long S3 = 0;
+  unsigned long S4 = 0;
+  for(unsigned long i = 1; 1 <= i && i <= 24; i++){
+    for(unsigned long j = 1; j <= 24; j++){
        for(; i+h-1 <= 24; w++){
          for(; j+2*w-1 ; h++){
-		  printf("1, %d,%d, %d, %d",i,j,w,h);
+		  printf("1, %lu,%lu, %lu, %lu",i,j,w,h);
 
            S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
            S2 = sumImagePart(tab,i,i+h-1,j+w,j+2*w-1);
-	   printf("1, %d,%d, %d, %d",i,j,w,h);
+	   printf("1, %lu,%lu, %lu, %lu",i,j,w,h);
            *rst = set_feature(1, i, j, w, h, S1-S2);
            idx++;
 	   rst++;
@@ -165,8 +165,8 @@ printf("test2");
  }
         w=1;
         h=1;
-        for(int i = 1; 1 <= i && i <= 24; i++){
-         for(int j = 1; j <= 24; j++){
+        for(unsigned long i = 1; 1 <= i && i <= 24; i++){
+         for(unsigned long j = 1; j <= 24; j++){
            for(; i+h-1 <= 24; w++){
             for(; j+3*w-1 ; h++){
             S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
@@ -181,8 +181,8 @@ printf("test2");
  }
 	w=1;
         h=1;
-        for(int i = 1; 1 <= i && i <= 24; i++){
-         for(int j = 1; j <= 24;j++){
+        for(unsigned long i = 1; 1 <= i && i <= 24; i++){
+         for(unsigned long j = 1; j <= 24;j++){
            for(; i+2*h-1 <= 24; w++){
             for(; j+w-1 ; h++){
             S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
@@ -198,8 +198,8 @@ printf("test2");
 
         w=1;
         h=1;
-         for(int i = 1; 1 <= i && i <= 24; i++){
-         for(int j = 1; j <= 24;j++){
+         for(unsigned long i = 1; 1 <= i && i <= 24; i++){
+         for(unsigned long j = 1; j <= 24;j++){
            for(; i+3*h-1 <= 24; w++){
             for(; j+w-1 ; h++){
             S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
@@ -214,8 +214,8 @@ printf("test2");
  }
 	w=1;
         h=1;
-         for(int i = 1; 1 <= i && i <= 24; i++){
-         for(int j = 1; j <= 24; j++){
+         for(unsigned long i = 1; 1 <= i && i <= 24; i++){
+         for(unsigned long j = 1; j <= 24; j++){
            for(; i+2*h-1 <= 24; w++){
             for(; j+2*w-1 ; h++){
             S1 = sumImagePart(tab,i,i+h-1,j,j+w-1);
