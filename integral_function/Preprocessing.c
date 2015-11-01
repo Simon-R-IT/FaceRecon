@@ -4,7 +4,7 @@
 # include <assert.h>
 # include <SDL/SDL.h>
 # include <SDL/SDL_image.h>
-# include "int_image.h"
+# include "Preprocessing.h"
 
 /* Code optimisé pour le projet
 Seule fonction utile à rappeler en cas de besoin :
@@ -187,10 +187,10 @@ void preprocessing(char *name[])
   SDL_FreeSurface(img);
 }
 
-int main(int argc, char *argv[]) // The Test
+/*int main(int argc, char *argv[]) // The Test
 {
   if (argc < 2)
     printf("There is no img, man");
   preprocessing(&argv[1]);
   return 1;
-}
+}*/

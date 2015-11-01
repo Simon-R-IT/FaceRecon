@@ -1,21 +1,28 @@
 #Basic Makefile
 
 #Compilers and options
-CC=gcc
-CPPFLAGS=`pkg-config --cflags sdl`
+CC=clang -fsanitize=address
+CPPFLAGS=`pkg-config --cflags sdl` -MMD -MP 
 CFLAGS= -Wall -Wextra -std=c99 -O3
 LDFLAGS=
 LDLIBS=`pkg-config --libs sdl` -lSDL_image
 
-SRC= int_image.c
+SRC= Preprocessing.c int_image.c
 OBJ= ${SRC:.c=.o}
 
-all: main
+# dependencies files (produced from source files list)
+DEP= ${SRC:.c=.d}
 
-main: ${OBJ}
+# include dependencies files
+-include ${DEP}
+ 
+all: int_image
+
+int_image: ${OBJ}
 
 clean:
 	rm -f *~ *.o
+	rm -f ${DEP}
 	rm -f int_image
 
 #END
