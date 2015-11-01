@@ -106,6 +106,13 @@ unsigned long** int_image(SDL_Surface *img){
 }
 
 unsigned long sumImagePart(unsigned long** integralImage,unsigned long x1,unsigned long y1,unsigned long x2, unsigned long y2){
+  x1 = x1+y1;
+  y1=x1-y1;
+  x1=x1-y1;
+  x2=x2+y2;
+  y2=x2-y2;
+  x2=x2-y2;
+    
   unsigned long sum = integralImage[x2][y2];
   if((x1 >= 1) & (y1 >= 1))
     sum = sum - integralImage[x1-1][y2] - integralImage[x2][y1-1]+ integralImage[x1-1][y1-1];
@@ -139,9 +146,7 @@ void set_feature(feature *features, unsigned long index, unsigned long f, unsign
 
 feature* haar_features(SDL_Surface * img)
 {
-  printf("test1");
   unsigned long** tab = int_image(img);
-  printf("test2");
   feature *features = malloc(200000* sizeof(*features));
   unsigned long index = 0;
   unsigned long i = 0;
@@ -152,6 +157,8 @@ feature* haar_features(SDL_Surface * img)
   long S2 = 0;
   long S3 = 0;
   long S4 = 0;
+  int counter = 0;
+  printf("\n");
   for(i = 0;  i <= 23; i++)
   {
     for(j = 0; j <= 23; j++)
@@ -160,11 +167,13 @@ feature* haar_features(SDL_Surface * img)
        {
          for(w=1; j+2*w-1<24 ; w++)
 	 {
-           S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
-           S2 = sumImagePart(tab, i, j+w, i+h-1, j+2*w-1);
-	   printf("S1 %lu S2 %lu\n", S1, S2);
+           S1 = sumImagePart(tab,i, j,  i+h-1, j+w-1);
+           S2 = sumImagePart(tab,i, j+w, i+h-1 , j+2*w-1);
+	   //if (counter < 15)
+	   //printf("a : S1 %04lu S2 %04lu Sum %04ld\n", S1, S2, S1-S2);
            set_feature(features, index, 1, i, j, w, h, S1-S2);
            index++;
+	   counter++;
 	 }
        }
     }
@@ -180,6 +189,8 @@ feature* haar_features(SDL_Surface * img)
 	  S1 = sumImagePart(tab, i, j, i+h-1, j+w-1);
           S2 = sumImagePart(tab, i, j+w, i+h-1, j+2*w-1);
           S3 = sumImagePart(tab, i, j+2*w, i+h-1, j+3*w-1);
+	  if (w < 15 && h == 1 && i == 0 && j == 0)
+	     printf("b : S1 %04lu S2 %04lu Sum %04ld\n", S1, S2, S1-S2);
           set_feature(features, index, 2, i, j, w, h, S1-S2+S3);
           index++;
 	}
@@ -242,15 +253,29 @@ feature* haar_features(SDL_Surface * img)
   return features;
 }
 
+void to_grey_lvl(SDL_Surface *img)
+{
+  uint8_t r, g, b;
+  for (int i = 0; i < img->w; i++)
+  {
+    for (int j = 0; j < img->h; j++)
+    {
+      SDL_GetRGB(getpixel(img, i, j), img->format, &r, &g, &b);
+      Uint32 grey = r * 0.3 + g * 0.59 + b * 0.11;
+      putpixel(img, i, j, SDL_MapRGB(img->format, grey, grey, grey));
+    }
+  }
+}
 
 int main (int argc, char *argv[]){
   if(argc<2)
     return 1;
   init_sdl();
   SDL_Surface * img=load_image(argv[1]);
+  to_grey_lvl(img);
     for(int i=0;i<7;i++){
       for(int j=0;j<7;j++){
-	printf("%d |",get_pixel_value(img,j,i));// j,i
+	printf("%03d |",get_pixel_value(img,j,i));// j,i
       }
       printf("\n");
     }
@@ -262,7 +287,7 @@ int main (int argc, char *argv[]){
     }
     printf("\n");
   }
-  printf("\n Voici la somme comprise entre (1,1) et (2,2) \%ld\n",sumImagePart(integral,0,0,1,1));
+  printf("\n Voici la somme comprise entre (0,0) et (3,3) \%ld\n",sumImagePart(integral,0,0,3,3));
   feature* results = haar_features(img);
   free(results);
   free(*integral);

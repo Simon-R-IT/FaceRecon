@@ -4,6 +4,7 @@
 # include <assert.h>
 # include <SDL/SDL.h>
 # include <SDL/SDL_image.h>
+# include "int_image.h"
 
 /* Code optimisé pour le projet
 Seule fonction utile à rappeler en cas de besoin :
@@ -178,11 +179,11 @@ void preprocessing(char *name[])
 {
   init_sdl();
   SDL_Surface* img = load_image(name[0]);
-  display_image(img);
+  //display_image(img);
   to_grey_lvl(img);
-  display_image(img);
-  normalized(img);
-  display_image(img);
+  //display_image(img);
+  //normalized(img);
+  //display_image(img);
   SDL_FreeSurface(img);
 }
 
