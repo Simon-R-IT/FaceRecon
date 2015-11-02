@@ -182,7 +182,7 @@ void preprocessing(char *name[])
   //display_image(img);
   to_grey_lvl(img);
   //display_image(img);
-  //normalized(img);
+  normalized(img);
   //display_image(img);
   SDL_FreeSurface(img);
 }
