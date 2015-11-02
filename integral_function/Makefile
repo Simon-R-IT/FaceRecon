@@ -3,7 +3,7 @@
 #Compilers and options
 CC=clang -fsanitize=address
 CPPFLAGS=`pkg-config --cflags sdl` -MMD -MP 
-CFLAGS= -Wall -Wextra -std=c99 -O3
+CFLAGS= -Wall -Wextra -std=c99 -pedantic -O3
 LDFLAGS=
 LDLIBS=`pkg-config --libs sdl` -lSDL_image
 
