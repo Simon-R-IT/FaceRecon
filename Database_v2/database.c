@@ -11,48 +11,47 @@ typedef struct
 
 
 
-char *add(char *name)
+/*char *add(char *name)
 {
   
-}
+}*/
 
-int data_len(FILE file)
+unsigned long data_len(FILE *file)
 {
-  char ch;
   int len = 0;
-  while (ch != EOF)
-  {
-    ch = fgetc(file);
-    len++;
-  }
+  fseek(file, 0L, SEEK_END);
+  len = ftell(file);
+  fseek(file, 0L, SEEK_SET);
   return len;
 }
 
-database *read_data(FILE file)
+database *read_data(FILE *file)
 {
-  database *data = malloc(data_len + 1) * sizeof(*database));
+  database *data = malloc(data_len * sizeof(data));
   int index, end = 0;
   while (end == 0)
   {
-    fscanf(data, "%s::%s$\n", &data[i].name, &data[i].fname);
+    fscanf(file, "%s::%s$\n", data[index].name, data[index].fname);
     index++;
-    if (data[i].name == "- End."
+    char *end_string = "- End.";
+    if (strcmp(data[index].name, end_string) == 0)
 	end = 1;
   }
   return data;
 }
 
-FILE *write_file(database *data)
+FILE *write_file(database *data, FILE *file)
 {
-  for (int i = 0; i < sizeof(data) ; i++)
-    fprintf(file, "%s::%s$\n", data[i].name, &data[i].fname);
-  fprintf("- End.");
+  
+  for (unsigned long i = 0; i < sizeof(data) ; i++)
+    fprintf(file, "%s::%s$\n", data[i].name, data[i].fname);
+  fprintf(file, "- End.");
 }
 
 int main(/*int argc, char *argv[]*/)
 {
   FILE *file;
-  data = fopen("Database.txt", "w+");
+  file = fopen("Database.txt", "w+");
   if (file != NULL)
   {
     read_data(file);
