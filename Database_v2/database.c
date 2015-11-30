@@ -2,6 +2,7 @@
 # include <stdlib.h>
 # include <assert.h>
 # include <err.h>
+# include <string.h>
 
 typedef struct
 {
@@ -14,7 +15,7 @@ typedef struct
 /*char *add(char *name)
 {
   
-}*/
+}
 
 unsigned long data_len(FILE *file)
 {
@@ -23,41 +24,72 @@ unsigned long data_len(FILE *file)
   len = ftell(file);
   fseek(file, 0L, SEEK_SET);
   return len;
+}*/
+
+database *init_database()
+{
+  database *data = malloc(sizeof(database));
+  data->name = NULL;
+  data->fname = NULL;
+  return data;
 }
 
-database *read_data(FILE *file)
+int str_len(char *s)
 {
-  database *data = malloc(data_len * sizeof(data));
-  int index, end = 0;
+  int len = 0;
+  while (*(s + len) != '\0')
+    len++;
+  return len;
+}
+
+int read_data(FILE *file, database *data)
+{
+  int index = 0;
+  char *name = NULL, *fname = NULL;
   while (end == 0)
   {
-    fscanf(file, "%s::%s$\n", data[index].name, data[index].fname);
+    data = realloc(data, sizeof(data) * (index + 1) * 2);
+    fscanf(file, "%s::%s$\n", name, fname);
+    data[index].name = malloc(str_len(name)*sizeof(char) + 1);
+    strcpy(data[index].name, name);
+    data[index].fname = malloc(str_len(fname)*sizeof(char) + 1);
+    strcpy(data[index].fname, fname);
     index++;
     char *end_string = "- End.";
     if (strcmp(data[index].name, end_string) == 0)
 	end = 1;
   }
-  return data;
+  return index;
 }
 
-FILE *write_file(database *data, FILE *file)
+/*void write_file(database *data, FILE *for)
 {
-  
-  for (unsigned long i = 0; i < sizeof(data) ; i++)
+  unsigned (file long i = 0; i < sizeof(data) ; i++)
     fprintf(file, "%s::%s$\n", data[i].name, data[i].fname);
   fprintf(file, "- End.");
+  }*/
+
+void print_database(database *data, int index)
+{
+  printf("Content of the database:\n");
+  for (int i = 0; i < index; i++)
+    printf("\t%s %s\n", data[i].name, data[i].fname);
 }
 
 int main(/*int argc, char *argv[]*/)
 {
+  printf("coucou");
   FILE *file;
-  file = fopen("Database.txt", "w+");
-  if (file != NULL)
-  {
-    read_data(file);
-  }
-  database *data = read_data(file);
+  file = fopen("Database.txt", "r");
+  printf("Crash before init");
+  database *data = init_database();
+  printf("Crash before read");
+  int nb_elt = read_data(file, data);
+  printf("Crash before print");
+  print_database(data, nb_elt);
+  //write_file(data, file);
   fclose(file);
+  free(data);
   return 0;
 }
 
