@@ -1,0 +1,2 @@
+gcc -Wall -g test.c -o test `pkg-config --cflags gtk+-2.0` \
+`pkg-config --libs gtk+-2.0`
